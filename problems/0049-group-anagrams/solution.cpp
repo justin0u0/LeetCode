@@ -23,3 +23,37 @@ public:
     return answer;
   }
 };
+
+/**
+ * Author: justin0u0<mail@justin0u0.com>
+ * Problem: https://leetcode.com/problems/group-anagrams/description/
+ * Runtime: 16ms (98.78%)
+ */
+
+const static auto _ = []() {
+  cin.tie(nullptr)->sync_with_stdio(false);
+  return nullptr;
+}();
+
+class Solution {
+public:
+  vector<vector<string>> groupAnagrams(vector<string>& strs) {
+    unordered_map<string, int> anagrams;
+    int id = 0;
+
+    vector<vector<string>> answer;
+    for (const string& s : strs) {
+      string copy = s;
+      sort(copy.begin(), copy.end());
+      auto it = anagrams.find(copy);
+      if (it == anagrams.end()) {
+        anagrams.emplace(copy, id);
+        answer.emplace_back(vector<string>{s});
+        ++id;
+      } else {
+        answer[it->second].emplace_back(s);
+      }
+    }
+    return answer;
+  }
+};
