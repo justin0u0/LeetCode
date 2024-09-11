@@ -5,58 +5,47 @@
  */
 
 const static auto _ = []() {
-  cin.tie(nullptr)->ios::sync_with_stdio(false);
+  cin.tie(nullptr)->sync_with_stdio(false);
   return nullptr;
 }();
 
 class Solution {
 private:
-  int n;
-  int sum[101];
-  int dp[101][101][2];
-
-  int dfs(int p, int m, bool alice) {
-    if (dp[p][m][alice] != -1) {
-      return dp[p][m][alice];
-    }
-    if (p == n) {
-      return 0;
-    }
-
-    int& res = dp[p][m][alice];
-
-    if (alice) {
-      res = 0;
-      for (int x = 1; x <= 2 * m; ++x) {
-        int last = x + p;
-        if (last > n) {
-          break;
-        }
-        res = max(res, dfs(last, max(m, x), !alice) + sum[last] - sum[p]);
-      }
-    } else {
-      res = 0x3f3f3f3f;
-      for (int x = 1; x <= 2 * m; ++x) {
-        int last = x + p;
-        if (last > n) {
-          break;
-        }
-        res = min(res, dfs(last, max(m, x), !alice));
-      }
-    }
-
-    return res;
-  }
+  int dp[101][101];
 public:
   int stoneGameII(vector<int>& piles) {
-    memset(dp, -1, sizeof(dp));
+    // dp[i][j]: maximum difference of stones the first player get
+    // with the from the ith tiles and M = j.
 
-    n = piles.size();
-    sum[0] = 0;
-    for (int i = 1; i <= n; ++i) {
-      sum[i] = sum[i - 1] + piles[i - 1];
+    const int n = piles.size();
+    for (int i = 0; i <= n; ++i) {
+      for (int j = 0; j <= n; ++j) {
+        dp[i][j] = INT_MIN;
+      }
     }
 
-    return dfs(0, 1, true);
+    function<int(int, int)> dfs = [&](int x, int m) {
+      if (x == n) {
+        return 0;
+      }
+
+      if (dp[x][m] != INT_MIN) {
+        return dp[x][m];
+      }
+
+      int& best = dp[x][m];
+      int take = 0;
+
+      // Try to take 1 ~ 2M stones
+      for (int i = x; i < min(n, x + 2 * m); ++i) {
+        take += piles[i];
+        best = max(best, take - dfs(i + 1, min(n, max(m, i - x + 1))));
+      }
+
+      return best;
+    };
+
+    int total = accumulate(piles.begin(), piles.end(), 0);
+    return (total + dfs(0, 1)) / 2;
   }
 };
