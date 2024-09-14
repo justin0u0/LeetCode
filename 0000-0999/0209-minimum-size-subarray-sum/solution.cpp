@@ -17,16 +17,13 @@ public:
     int answer = INT_MAX;
     for (int i = 0; i < nums.size(); ++i) {
       sum += nums[i];
-      if (sum < target) {
-        continue;
-      }
-
-      while (j <= i && sum >= target) {
+      while (sum - nums[j] >= target) {
         sum -= nums[j];
         ++j;
       }
-
-      answer = min(answer, i - j + 2);
+      if (sum >= target) {
+        answer = min(answer, i - j + 1);
+      }
     }
 
     if (answer == INT_MAX) {
